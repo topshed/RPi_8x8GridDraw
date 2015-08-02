@@ -26,7 +26,7 @@ background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill((0, 51, 25))
 colour = (255,0,0) # Set default colour to red
-rotation = 0
+rotation = 90
 #uh.rotation(rotation)
 frame_number  = 1
 fps = 4
@@ -377,25 +377,29 @@ def importAni():
 	#animation = {}
 	frame_number = 1
 	file = open('animation8x8.py')
-	for r in range(4):
+	for r in range(3):
 		file.readline()
 
 	for frame  in range(line_count-8):
 		buff = file.readline()
 
 		load_frame = buff.split('], [')
+		#print load_frame
 		counter = 1
 		leds =[]
 		for f in load_frame:
                         
 			if counter == 1:
-				f = f[2:]
+				f = f[3:]
 			elif counter == 64:
-                                
-				f = f[:-4]
+				f = f[:-5]
+			elif counter%8 == 0 and counter != 64:
+				f = f[:-1]
+			elif (counter-1)%8 == 0:
+				f = f[1:]
 			
-			y = int(counter-1)/8
-			x = int(counter-1)%8
+			x = int(counter-1)/8
+			y = int(counter-1)%8
 			
 			#print(str(counter) + ' ' + f + ' x= ' + str(x) + ' y= ' + str(y))
 			led = LED(pos=(x, y))
@@ -505,4 +509,3 @@ while True:
 
 	#update the display
 	drawEverything()
-
