@@ -26,7 +26,7 @@ background = pygame.Surface(screen.get_size())
 background = background.convert()
 background.fill((0, 51, 25))
 colour = (255,0,0) # Set default colour to red
-rotation = 90
+rotation = 0
 #uh.rotation(rotation)
 frame_number  = 1
 fps = 4
@@ -94,9 +94,10 @@ def buildGrid(): # Takes a grid and builds versions for exporting (png and text)
 	png_grid = ['blank','blank','blank','blank','blank','blank','blank','blank']
 	for led in leds:
 		if led.lit:
-			val = led.pos[0] + (8 * led.pos[1])
+			#val = led.pos[0] + (8 * led.pos[1])
+			val = (8* led.pos[0]) +  led.pos[1]
 			#print val
-			grid[led.pos[0]][led.pos[1]] = [led.color[0], led.color[1], led.color[2]]
+			grid[led.pos[1]][led.pos[0]] = [led.color[0], led.color[1], led.color[2]]
 			if png_grid[led.pos[0]] == 'blank':
 				png_grid[led.pos[0]] = (led.color[0], led.color[1], led.color[2])
 			else:
@@ -330,8 +331,8 @@ def exportAni():
 	for playframe in range(1,(len(animation)+1)):
 		#print(playframe) 
 		leds =[]
-		for x in range(0, 8):
-			for y in range(0, 8):
+		for x in range(0,8):
+			for y in range(0,8):
 				led = LED(pos=(x, y))
 				leds.append(led)
 			for saved_led in animation[playframe]:
@@ -398,8 +399,8 @@ def importAni():
 			elif (counter-1)%8 == 0:
 				f = f[1:]
 			
-			x = int(counter-1)/8
-			y = int(counter-1)%8
+			y = int(counter-1)/8
+			x = int(counter-1)%8
 			
 			#print(str(counter) + ' ' + f + ' x= ' + str(x) + ' y= ' + str(y))
 			led = LED(pos=(x, y))
@@ -509,3 +510,4 @@ while True:
 
 	#update the display
 	drawEverything()
+
