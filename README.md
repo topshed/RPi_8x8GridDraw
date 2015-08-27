@@ -1,6 +1,6 @@
 # 8x8GridDraw
 
-These Python Pygame applications are for creating 8x8 pixel images and animations for loading onto either a Raspberry Pi [Astro-Pi] (http://astro-pi.org/hardware/) HAT  or [UnicornHat] (http://shop.pimoroni.com/products/unicorn-hat) LED matrix.
+These Python Pygame applications are for creating 8x8 pixel images and animations for loading onto either a Raspberry Pi [Sense HAT] (https://www.raspberrypi.org/blog/buy-the-sense-hat-as-seen-in-space/) (as used on teh Astro Pi)  or [UnicornHat] (http://shop.pimoroni.com/products/unicorn-hat) LED matrix.
 
 It offers a choice of several colours for the LEDs:
 
@@ -20,7 +20,7 @@ See my [blog] (http://richardhayler.blogspot.com/2015/06/creating-images-for-ast
 1. Run startx then open a terminal window. 
 2. Run 8x8grid-unicorn.py (for UnicornHat) or 8x8grid-astropi.py (for AstroPi)
 
-This Python program uses pygame and the AstroPi/UnicornHAT APIs to create and edit single frames or multi-frame animations. The animations can be exported as Python code or a single frame can be saved as an 8x8 png. 
+This Python program uses pygame and the Sense/UnicornHAT APIs to create and edit single frames or multi-frame animations. The animations can be exported as Python code or a single frame can be saved as an 8x8 png. 
 
 Animations and single frames can be directly loaded on the the  LED matrix.
 
