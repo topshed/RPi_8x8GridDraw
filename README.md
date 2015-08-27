@@ -18,7 +18,7 @@ See my [blog] (http://richardhayler.blogspot.com/2015/06/creating-images-for-ast
 ### Getting started
 
 1. Run startx then open a terminal window. 
-2. Run 8x8grid-unicorn.py (for UnicornHat) or 8x8grid-astropi.py (for AstroPi)
+2. Run 8x8grid-unicorn.py (for UnicornHat) or 8x8grid-sense.py (for Sense HAT)
 
 This Python program uses pygame and the Sense/UnicornHAT APIs to create and edit single frames or multi-frame animations. The animations can be exported as Python code or a single frame can be saved as an 8x8 png. 
 
