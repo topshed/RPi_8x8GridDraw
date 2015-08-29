@@ -6,7 +6,7 @@ from pygame.locals import *
 from led import LED
 from buttons import Button
 import png # pypng
-from astro_pi import AstroPi
+from sense_hat import AstroPi
 import copy, time
 
 saved = True
