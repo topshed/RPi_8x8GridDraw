@@ -16,7 +16,7 @@ pygame.font.init()
 
 ap=AstroPi()
 screen = pygame.display.set_mode((500, 530), 0, 32)
-pygame.display.set_caption('Astro Pi Grid editor')
+pygame.display.set_caption('Sense HAT Grid Editor')
 pygame.mouse.set_visible(1)
 
 background = pygame.Surface(screen.get_size())
@@ -310,7 +310,7 @@ def exportAni():
 
 	global saved
 	FILE=open('animation8x8.py','wb')
-	FILE.write('from astro_pi import AstroPi\n')
+	FILE.write('from sense_hat import AstroPi\n')
 	FILE.write('import time\n')
 	FILE.write('ap=AstroPi()\n')
 	FILE.write('FRAMES = [\n')
