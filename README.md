@@ -11,16 +11,16 @@ See my [blog] (http://richardhayler.blogspot.com/2015/06/creating-images-for-ast
 
 ###Installation
 
-1. Install the pypng Python module 
+1. Install the pypng Python module
 2. Install the appropriate library for your HAT
 3. Clone this repo
 
 ### Getting started
 
-1. Run startx then open a terminal window. 
-2. Run 8x8grid-unicorn.py (for UnicornHat) or 8x8grid-sense.py (for Sense HAT)
+1. Run startx then open a terminal window.
+2. Run 8x8grid.py. This will detect which kind of HAT you have and run the appropriate sub-program ( 8x8grid-unicorn for UnicornHat) or 8x8grid-sense.py (for Sense HAT). You can, of course, just run either one directly. 
 
-This Python program uses pygame and the Sense/UnicornHAT APIs to create and edit single frames or multi-frame animations. The animations can be exported as Python code or a single frame can be saved as an 8x8 png. 
+This Python program uses pygame and the Sense/UnicornHAT APIs to create and edit single frames or multi-frame animations. The animations can be exported as Python code or a single frame can be saved as an 8x8 png.
 
 Animations and single frames can be directly loaded on the the  LED matrix.
 
@@ -35,7 +35,7 @@ There are two ways to load a pattern on to the LED matrix using Python:
 
 So to build and display an animation, we either need a series of pngs or a bunch of consecutive lists.
 
-There are three export methods from the animator program, two for simgle frames and one for the entire sequence. 
+There are three export methods from the animator program, two for simgle frames and one for the entire sequence.
 
 ####Single Frame
 
@@ -45,7 +45,7 @@ There are three export methods from the animator program, two for simgle frames 
 
 ####Animation
 
-**Export to py**: generates a .py file which when run, will display the animation on the LED matrix. The file contains a few lines of Python and the raw list containing each frame (itself a list) as elements. If you want to use the list in another Python program, simply copy-n-paste the FRAMES list from the file. The output file is always called animation8x8.py and will be overwritten without warning you if it already exists. 
+**Export to py**: generates a .py file which when run, will display the animation on the LED matrix. The file contains a few lines of Python and the raw list containing each frame (itself a list) as elements. If you want to use the list in another Python program, simply copy-n-paste the FRAMES list from the file. The output file is always called animation8x8.py and will be overwritten without warning you if it already exists.
 
 When you've saved an animation, I recommend you copy anaimation8x8.py to another filename to avoid accidental overwriting.  
 
@@ -57,28 +57,30 @@ The '**Import from file**' loads the contents of animation8x8.py into the editor
 
 ###Basic features
 
-On the right hand side are a set of buttons to select the desired LED colour. If you want a different colour then you can edit (or add) a *setColourXXX* function in 8x8grid-animator.py and change the RGB value. 
+On the right hand side are a set of buttons to select the desired LED colour. If you want a different colour then you can edit (or add) a *setColourXXX* function in 8x8grid-xxxxhat.py and change the RGB value.
 
-The currently selected colour is shown in the circle below the buttons. 
+The currently selected colour is shown in the circle below the buttons.
 
-To set an LED's colour, click on its position in the editing window. If the LED is already set to a colour then clicking again will turn it to off, even if you have selected a new colour as the current one in use. Clicking a second time will set the LED to the new colour. 
+To set an LED's colour, click on its position in the editing window. If the LED is already set to a colour then clicking again will turn it to off, even if you have selected a new colour as the current one in use. Clicking a second time will set the LED to the new colour.
 
-To add a new frame, click on the **>>** button. This will create a duplicate on the current frame and increment the frame number displayed above. If you want a blank frame rather than a copy of the preceding one, just click the 'clear frame' button. 
+To add a new frame, click on the **>>** button. This will create a duplicate on the current frame and increment the frame number displayed above. If you want a blank frame rather than a copy of the preceding one, just click the 'clear frame' button.
 
-The **>>** button is also used to move to the next frame if one exists. There is currently no way to add a new frame in between existing frames. 
+The **>>** button is also used to move to the next frame if one exists. There is currently no way to add a new frame in between existing frames.
 
-Similarly, the **<<** button moves backwards through the frames of the animation. 
+Similarly, the **<<** button moves backwards through the frames of the animation.
 
 The '**Play on LEDs**' button will load the image you have created onto the LED matrix and – if there is more than one frame - run through the frames of the00 animation.
 
 To increase or decrease the speed at which the animation is played on the LED matrix, use the **+** and **–** buttons. You should the Frames per Second (FPS) value change accordingly. Note that this will also alter the frame-rate set in the exported .py file (default is 1 fps).
 
- 
+
 The '**Rotate LEDs**' button will rotate the image displayed on the LEDs by 90 degrees clockwise. It will not alter the orientation of the image within the editor.
 
-As mentioned earlier, the '**Clear Grid**' button will set all the LEDs on the screen to off (this will not affect any image loaded on to the LED matrix). 
+As mentioned earlier, the '**Clear Grid**' button will set all the LEDs on the screen to off (this will not affect any image loaded on to the LED matrix).
 
-The '**Delete**' button will remove the current frame and set the displayed frame to be the previous on in the series (e.g. if you're editing frame 6 and press the '**Delete**' button, you will set the current frame to number 5). 
+The '**Delete**' button will remove the current frame and set the displayed frame to be the previous on in the series (e.g. if you're editing frame 6 and press the '**Delete**' button, you will set the current frame to number 5).
+
+The '**QUit**' button will exit the program.
 
 ###Colour Definitions:
 

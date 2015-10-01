@@ -14,12 +14,12 @@ import copy, time
 
 saved = True
 warning = False
-pygame.init()
+pygame.display.init()
 pygame.font.init()
 
 #ap=AstroPi()
-screen = pygame.display.set_mode((500, 530), 0, 32)
-pygame.display.set_caption('UnicornHat Grid editor')
+screen = pygame.display.set_mode((530, 395), 0, 32)
+pygame.display.set_caption('UnicornHAT Grid editor')
 pygame.mouse.set_visible(1)
 
 background = pygame.Surface(screen.get_size())
@@ -34,43 +34,43 @@ fps = 4
 
 
 def setColourRed():
-	global colour 
+	global colour
 	colour = (255,0,0)
 
 def setColourBlue():
-	global colour 
+	global colour
 	colour = (0,0,255)
 
 def setColourGreen():
-	global colour 
+	global colour
 	colour = (0,255,0)
 
 def setColourPurple():
-	global colour 
+	global colour
 	colour = (102,0,204)
 
 def setColourPink():
-	global colour 
+	global colour
 	colour = (255,0,255)
 
 def setColourYellow():
-	global colour 
+	global colour
 	colour = (255,255,0)
 
 def setColourOrange():
-	global colour 
+	global colour
 	colour = (255,128,0)
 
 def setColourWhite():
-	global colour 
+	global colour
 	colour = (255,255,255)
 
 def setColourCyan():
-	global colour 
+	global colour
 	colour = (0,255,255)
 
 def clearGrid(): # Clears the pygame LED grid and sets all the leds.lit back to False
-	
+
 	for led in leds:
 		led.lit = False
 
@@ -102,7 +102,7 @@ def buildGrid(): # Takes a grid and builds versions for exporting (png and text)
 				png_grid[led.pos[0]] = (led.color[0], led.color[1], led.color[2])
 			else:
 				png_grid[led.pos[0]] = png_grid[led.pos[0]] + (led.color[0], led.color[1], led.color[2])
-		else: 
+		else:
 			if png_grid[led.pos[0]] == 'blank':
 				png_grid[led.pos[0]] = (0,0,0)
 			else:
@@ -112,12 +112,15 @@ def buildGrid(): # Takes a grid and builds versions for exporting (png and text)
 def piLoad(): # Loads image onto AstroPi matrix
 	#grid, grid_png = buildGrid()
 	#ap.set_pixels(grid)
-	uh.clear()
+	uh.off()
 	for led in leds:
 		if led.lit:
 			uh.set_pixel(led.pos[0], led.pos[1], led.color[0], led.color[1], led.color[2])
+
 			#print str(led.pos[0])+ ' ' +str(led.pos[1]) + ' ' + str(led.color[1])
 	uh.show()
+
+
 def exportGrid(): # Writes png to file
 
 	global saved
@@ -143,10 +146,8 @@ def rotate(): #Rotates image on AstroPi LED matrix
 	#ap.set_rotation(rotation)
 	uh.rotation(rotation)
 
-
-
 def handleClick():
-   
+
 	global saved
 	global warning
 	pos = pygame.mouse.get_pos()
@@ -163,10 +164,10 @@ def handleClick():
 		for butt in buttons_warn:
 			if butt.rect.collidepoint(pos):
 				butt.click()
-				
- 
+
+
 def findLED(clicked_pos, leds): # reads leds and checks if clicked position is in one of them
-	
+
 	x = clicked_pos[0]
 	y = clicked_pos[1]
 	for led in leds:
@@ -177,7 +178,7 @@ def findLED(clicked_pos, leds): # reads leds and checks if clicked position is i
 
 
 def drawEverything():
-	
+
 	global warning
 	screen.blit(background, (0, 0))
 	#draw the leds
@@ -186,21 +187,21 @@ def drawEverything():
 	for button in buttons:
 		button.draw(screen)
 	font = pygame.font.Font(None,16)
-	
-	frame_text = 'Frame ' + str(frame_number) 
+
+	frame_text = 'Frame ' + str(frame_number)
 	text = font.render(frame_text,1,(255,255,255))
-	screen.blit(text, (445,370))
-	fps_text = 'Frame rate= ' + str(fps) +' fps' 
+	screen.blit(text, (5,10))  # done
+	fps_text = 'Frame rate= ' + str(fps) +' fps'
 	text = font.render(fps_text,1,(255,255,255))
-	screen.blit(text, (343,440))
+	screen.blit(text, (145,10)) # done
 	font = pygame.font.Font(None,18)
-	export_text = 'Animation'
+	export_text = 'Animation' # done
 	text = font.render(export_text,1,(255,255,255))
-	screen.blit(text, (30,440))
+	screen.blit(text, (445,15))  # done
 	export_text = 'Single Frame'
 	text = font.render(export_text,1,(255,255,255))
-	screen.blit(text, (130,440))
-	pygame.draw.circle(screen,colour,(470,345),20,0)
+	screen.blit(text, (435,120)) # done
+	pygame.draw.circle(screen,colour,(390,345),20,0)
 	#flip the screen
 	if warning:
 		for button in buttons_warn:
@@ -219,7 +220,7 @@ def load_leds_to_animation():
 							led.lit = True
 
 def nextFrame():
-	
+
 	global frame_number
 	global leds
 	#print(frame_number)
@@ -230,11 +231,11 @@ def nextFrame():
 		leds =[]
 		for x in range(0, 8):
 			for y in range(0, 8):
-				led = LED(pos=(x, y))
+				led = LED(radius=20,pos=(x, y))
 				leds.append(led)
 		load_leds_to_animation()
-			
-	
+
+
 
 def prevFrame():
 
@@ -249,7 +250,7 @@ def prevFrame():
 		leds =[]
 		for x in range(0, 8):
 			for y in range(0, 8):
-				led = LED(pos=(x, y))
+				led = LED(radius=20,pos=(x, y))
 				leds.append(led)
 		load_leds_to_animation()
 
@@ -259,11 +260,11 @@ def delFrame():
 	if len(animation) > 1:
 		animation[frame_number] = copy.deepcopy(leds)
 		del animation[frame_number]
-		prevFrame()		
+		prevFrame()
 		for shuffle_frame in range(frame_number+1,len(animation)):
 			animation[shuffle_frame] = animation[shuffle_frame+1]
 		del animation[len(animation)]
-		
+
 
 
 def getLitLEDs():
@@ -279,7 +280,7 @@ def getLitLEDs():
 leds = []
 for x in range(0, 8):
 	for y in range(0, 8):
-		led = LED(pos=(x, y))
+		led = LED(radius=20,pos=(x, y))
 		leds.append(led)
 buttons = []
 buttons_warn = []
@@ -287,17 +288,17 @@ animation={}
 #global frame_number
 
 def play():
-	
+
 	global leds
 	global frame_number
 	animation[frame_number] = copy.deepcopy(leds)
 	#print 'length of ani is ' + str(len(animation))
 	for playframe in range(1,(len(animation)+1)):
-		#print(playframe) 
+		#print(playframe)
 		leds =[]
 		for x in range(0, 8):
 			for y in range(0, 8):
-				led = LED(pos=(x, y))
+				led = LED(radius=20,pos=(x, y))
 				leds.append(led)
 			for saved_led in animation[playframe]:
 				if saved_led.lit:
@@ -307,7 +308,7 @@ def play():
 							led.lit = True
 		piLoad()
 		time.sleep(1.0/fps)
-		
+
 def faster():
 	global fps
 	fps+=1
@@ -329,11 +330,11 @@ def exportAni():
 	animation[frame_number] = copy.deepcopy(leds)
 	#print 'length of ani is ' + str(len(animation))
 	for playframe in range(1,(len(animation)+1)):
-		#print(playframe) 
+		#print(playframe)
 		leds =[]
 		for x in range(0,8):
 			for y in range(0,8):
-				led = LED(pos=(x, y))
+				led = LED(radius=20,pos=(x, y))
 				leds.append(led)
 			for saved_led in animation[playframe]:
 				if saved_led.lit:
@@ -343,7 +344,7 @@ def exportAni():
 							led.lit = True
 		grid, png_grid = buildGrid()
 		#grid = uh.get_pixels()
-		
+
 		FILE.write(str(grid))
 		FILE.write(',\n')
 	FILE.write(']\n')
@@ -358,15 +359,22 @@ def prog_exit():
 	print('exit clicked')
 	global warning
 	warning = False
-	clearGrid()
+	#clearGrid()
 	pygame.quit()
-	sys.exit()
+	sys.exit(-1)
 
 def save_it():
 	print('save clicked')
 	global warning
 	exportAni()
 	warning = False
+
+def quit():
+	global saved
+	if saved == False:
+		nosave_warn()
+	else:
+		prog_exit()
 
 def importAni():
         global leds
@@ -389,7 +397,7 @@ def importAni():
 		counter = 1
 		leds =[]
 		for f in load_frame:
-                        
+
 			if counter == 1:
 				f = f[3:]
 			elif counter == 64:
@@ -398,15 +406,15 @@ def importAni():
 				f = f[:-1]
 			elif (counter-1)%8 == 0:
 				f = f[1:]
-			
+
 			y = int(counter-1)/8
 			x = int(counter-1)%8
-			
+
 			#print(str(counter) + ' ' + f + ' x= ' + str(x) + ' y= ' + str(y))
-			led = LED(pos=(x, y))
+			led = LED(radius=20,pos=(x, y))
 			if f == '0, 0, 0':
 				led.lit = False
-			
+
 			else:
 				led.lit = True
 				f_colours = f.split(',')
@@ -421,59 +429,62 @@ def importAni():
 	file.close()
 	#drawEverything()
 
-exportAniButton = Button('Export to py', action=exportAni,  pos=(10, 460), color=(153,0,0))
+exportAniButton = Button('Export to py', action=exportAni,  pos=(425, 45), color=(153,0,0))  # done
 buttons.append(exportAniButton)
-importAniButton = Button('Import from file', action=importAni,  pos=(10, 495), color=(153,0,0))
+importAniButton = Button('Import from file', action=importAni,  pos=(425, 80 ), color=(153,0,0)) # done
 buttons.append(importAniButton)
 
-exportConsButton = Button('Export to console', action=exportCons, pos=(120, 460), color=(160,160,160))
+exportConsButton = Button('Export to console', action=exportCons, pos=(425, 150), color=(160,160,160)) # done
 buttons.append(exportConsButton)
-exportPngButton = Button('Export to PNG', action=exportGrid, pos=(120, 495), color=(160,160,160))
+exportPngButton = Button('Export to PNG', action=exportGrid, pos=(425, 185), color=(160,160,160)) # done
 buttons.append(exportPngButton)
 
-RotateButton = Button('Rotate LEDs', action=rotate,  pos=(230, 460), color=(205,255,255))
+RotateButton = Button('Rotate LEDs', action=rotate,  pos=(425, 255), color=(205,255,255)) # done
 buttons.append(RotateButton)
-clearButton = Button('Clear Grid', action=clearGrid,  pos=(230, 495), color=(204,255,255))
+clearButton = Button('Clear Grid', action=clearGrid,  pos=(425, 220), color=(204,255,255))# done
 buttons.append(clearButton)
 
-FasterButton = Button('+', action=faster, size=(45,25), pos=(340, 460), color=(184,138,0))
+quitButton = Button('Quit', action=quit,  pos=(425, 290), color=(96,96,96))
+buttons.append(quitButton)
+
+FasterButton = Button('+', action=faster, size=(45,30), pos=(245, 5), color=(184,138,0)) # done
 buttons.append(FasterButton)
-SlowerButton = Button('-', action=slower, size=(45,25), pos=(395, 460), color=(184,138,0))
+SlowerButton = Button('-', action=slower, size=(45,30), pos=(295, 5), color=(184,138,0))# done
 buttons.append(SlowerButton)
 
-PlayButton = Button('Play on LEDs', action=play,  pos=(340, 495), color=(184,138,0))
+PlayButton = Button('Play on LEDs', action=play,  pos=(425, 340), color=(184,138,0)) # done
 buttons.append(PlayButton)
 
-RedButton = Button('', action=setColourRed, size=(50,30), pos=(445, 10),hilight=(0, 200, 200),color=(255,0,0))
+RedButton = Button('', action=setColourRed, size=(50,30), pos=(365, 10),hilight=(0, 200, 200),color=(255,0,0)) # done
 buttons.append(RedButton)
-OrangeButton = Button('', action=setColourOrange, size=(50,30), pos=(445, 45),hilight=(0, 200, 200),color=(255,128,0))
+OrangeButton = Button('', action=setColourOrange, size=(50,30), pos=(365, 45),hilight=(0, 200, 200),color=(255,128,0)) # done
 buttons.append(OrangeButton)
-YellowButton = Button('', action=setColourYellow, size=(50,30), pos=(445, 80),hilight=(0, 200, 200),color=(255,255,0))
+YellowButton = Button('', action=setColourYellow, size=(50,30), pos=(365, 80),hilight=(0, 200, 200),color=(255,255,0)) # done
 buttons.append(YellowButton)
-GreenButton = Button('', action=setColourGreen, size=(50,30), pos=(445, 115),hilight=(0, 200, 200),color=(0,255,0))
+GreenButton = Button('', action=setColourGreen, size=(50,30), pos=(365, 115),hilight=(0, 200, 200),color=(0,255,0)) # done
 buttons.append(GreenButton)
-CyanButton = Button('', action=setColourCyan, size=(50,30), pos=(445, 150),hilight=(0, 200, 200),color=(0,255,255))
+CyanButton = Button('', action=setColourCyan, size=(50,30), pos=(365, 150),hilight=(0, 200, 200),color=(0,255,255)) # done
 buttons.append(CyanButton)
-BlueButton = Button('', action=setColourBlue, size=(50,30), pos=(445, 185),hilight=(0, 200, 200),color=(0,0,255))
+BlueButton = Button('', action=setColourBlue, size=(50,30), pos=(365, 185),hilight=(0, 200, 200),color=(0,0,255)) # done
 buttons.append(BlueButton)
-PurpleButton = Button('', action=setColourPurple, size=(50,30), pos=(445, 220),hilight=(0, 200, 200),color=(102,0,204))
+PurpleButton = Button('', action=setColourPurple, size=(50,30), pos=(365, 220),hilight=(0, 200, 200),color=(102,0,204)) # done
 buttons.append(PurpleButton)
-PinkButton = Button('', action=setColourPink, size=(50,30), pos=(445, 255),hilight=(0, 200, 200),color=(255,0,255))
+PinkButton = Button('', action=setColourPink, size=(50,30), pos=(365, 255),hilight=(0, 200, 200),color=(255,0,255)) # done
 buttons.append(PinkButton)
-WhiteButton = Button('', action=setColourWhite, size=(50,30), pos=(445, 290),hilight=(0, 200, 200),color=(255,255,255))
+WhiteButton = Button('', action=setColourWhite, size=(50,30), pos=(365, 290),hilight=(0, 200, 200),color=(255,255,255)) # done
 buttons.append(WhiteButton)
 
-PrevFrameButton = Button('<-', action=prevFrame, size=(25,25), pos=(442, 385), color=(184,138,0))
+PrevFrameButton = Button('<-', action=prevFrame, size=(30,30), pos=(55, 5), color=(184,138,0)) # done
 buttons.append(PrevFrameButton)
-NextFrameButton = Button('->', action=nextFrame, size=(25,25), pos=(472, 385), color=(184,138,0))
+NextFrameButton = Button('->', action=nextFrame, size=(30,30), pos=(95, 5), color=(184,138,0)) # done
 buttons.append(NextFrameButton)
 
-DelFrame = Button('Delete', action=delFrame, size=(50,25), pos=(445, 415), color=(184,138,0))
+DelFrame = Button('Delete', action=delFrame, size=(50,25), pos=(365, 415), color=(184,138,0)) # done
 buttons.append(DelFrame)
 
-saveButton = Button('Save', action=save_it, size=(60,50), pos=(150, 180),hilight=(200, 0, 0),color=(255,255,0))
+saveButton = Button('Save', action=save_it, size=(60,50), pos=(150, 250),hilight=(200, 0, 0),color=(255,255,0)) # done
 buttons_warn.append(saveButton)
-QuitButton = Button('Quit', action=prog_exit, size=(60,50), pos=(260, 180),hilight=(200, 0, 0),color=(255,255,0))
+QuitButton = Button('Quit', action=prog_exit, size=(60,50), pos=(260, 250),hilight=(200, 0, 0),color=(255,255,0)) # done
 buttons_warn.append(QuitButton)
 
 
@@ -481,8 +492,8 @@ def nosave_warn():
 	global warning
 	warning = True
 	font = pygame.font.Font(None,48)
-	frame_text = 'Unsaved Frames ' 
-	
+	frame_text = 'Unsaved Frames '
+
 	for d in range(5):
 		text = font.render(frame_text,1,(255,0,0))
 		screen.blit(text, (100,100))
@@ -504,10 +515,9 @@ while True:
 				nosave_warn()
 			else:
 				prog_exit()
-		
+
 		if event.type == MOUSEBUTTONDOWN:
 			handleClick()
 
 	#update the display
 	drawEverything()
-
