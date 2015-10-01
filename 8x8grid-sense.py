@@ -366,8 +366,8 @@ def quit():
 		prog_exit()
 
 def importAni():
-		global leds
-		global frame_number
+	global leds
+	global frame_number
 	with open('animation8x8.py') as ll:
 		line_count = sum(1 for _ in ll)
 	ll.close()

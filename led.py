@@ -32,7 +32,7 @@ class LED():
 	def clicked(self, colour):
 
 		# what to do when clicked
-	self.color = colour
+		self.color = colour
 		if self.lit:
 			self.lit = False
 		else:
