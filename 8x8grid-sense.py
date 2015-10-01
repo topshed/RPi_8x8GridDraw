@@ -17,7 +17,7 @@ pygame.init()
 pygame.font.init()
 
 sh=SenseHat()
-screen = pygame.display.set_mode((530, 395sudo ), 0, 32)
+screen = pygame.display.set_mode((530, 395), 0, 32)
 pygame.display.set_caption('Sense HAT Grid Editor')
 pygame.mouse.set_visible(1)
 
