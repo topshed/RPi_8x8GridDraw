@@ -409,8 +409,8 @@ def importAni():
 			elif (counter-1)%8 == 0:
 				f = f[1:]
 
-			y = int(counter-1)/8
-			x = int(counter-1)%8
+			y = int((counter-1)/8)
+			x = int((counter-1)%8)
 			#print(counter,x,y)
 
 			#print(str(counter) + ' ' + f + ' x= ' + str(x) + ' y= ' + str(y))

@@ -398,8 +398,8 @@ def importAni():
 
 				f = f[:-4]
 
-			y = int(counter-1)/8
-			x = int(counter-1)%8
+			y = int((counter-1)/8)
+			x = int((counter-1)%8)
 
 			#print(str(counter) + ' ' + f + ' x= ' + str(x) + ' y= ' + str(y))
 			led = LED(radius=20,pos=(x, y))
