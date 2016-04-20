@@ -187,11 +187,11 @@ def drawEverything():
     font = pygame.font.Font(None,16)
 
     frame_text = 'Frame '
-	text = font.render(frame_text,1,(255,255,255))
-	screen.blit(text, (5,5))
-	frame_num_text = str(frame_number)
-	text = font.render(frame_num_text,1,(255,255,255))
-	screen.blit(text, (18,18))
+    text = font.render(frame_text,1,(255,255,255))
+    screen.blit(text, (5,5))
+    frame_num_text = str(frame_number)
+    text = font.render(frame_num_text,1,(255,255,255))
+    screen.blit(text, (18,18))
     fps_text = 'Frame rate= ' + str(fps) +' fps'
     text = font.render(fps_text,1,(255,255,255))
     screen.blit(text, (175,10)) # done
