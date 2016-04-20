@@ -7,12 +7,12 @@ if os.path.isfile("/proc/device-tree/hat/product"):
 		print('Sense HAT detected')
 		mypath = os.path.dirname(os.path.abspath(__file__))
 		file.close()
-		os.system("/usr/bin/env python " + mypath+"/8x8grid-sense.py")
+		os.system("/usr/bin/env python3 " + mypath+"/8x8grid-sense.py")
 	elif hat == "Unicorn HAT\x00":
 		print('Unicorn HAT detected')
 		mypath = os.path.dirname(os.path.abspath(__file__))
 		file.close()
-		os.system("/usr/bin/env python " + mypath+"/8x8grid-unicorn.py")
+		os.system("/usr/bin/env python3 " + mypath+"/8x8grid-unicorn.py")
 	else:
 		print("Unknown HAT : " + str(hat))
 		file.close()
@@ -23,6 +23,6 @@ else:
 	if answer == 'y':
 		print('Configuring for Unicorn Phat')
 		mypath = os.path.dirname(os.path.abspath(__file__))
-		os.system("/usr/bin/env python " + mypath+"/8x8grid-unicornphat.py")
+		os.system("/usr/bin/env python3 " + mypath+"/8x8grid-unicornphat.py")
 	else:
 		sys.exit()

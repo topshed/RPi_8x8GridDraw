@@ -13,14 +13,19 @@ See my [blog] (http://richardhayler.blogspot.com/2015/06/creating-images-for-ast
 
 ###Installation
 
-1. Install the pypng Python module
+This software is written for Python3.x 
+
+1. Install the pypng Python3 module
+
+ sudo pip3 install pypng
+ 
 2. Install the appropriate library for your HAT
 3. Clone this repo
 
 ### Getting started
 
 1. Run startx then open a terminal window.
-2. Run 8x8grid.py. This will detect which kind of HAT you have and run the appropriate sub-program ( 8x8grid-unicorn for UnicornHat) or 8x8grid-sense.py (for Sense HAT). If you are using a Unicorn PHAT, type 'y' when asked and 8x8grid-unicornphat will be run. . You can, of course, just run either program directly. 
+2. Run 8x8grid.py. This will detect which kind of HAT you have and run the appropriate sub-program ( 8x8grid-unicorn for UnicornHat) or 8x8grid-sense.py (for Sense HAT). If you are using a Unicorn PHAT, type 'y' when asked and 8x8grid-unicornphat will be run. You can, of course, just run either program directly (which will also work if you want to use Python2.x). 
 
 This Python program uses pygame and the Sense/UnicornHAT APIs to create and edit single frames or multi-frame animations. The animations can be exported as Python code or a single frame can be saved as an 8x8 png.
 
