@@ -145,6 +145,7 @@ def rotate(): #Rotates image on AstroPi LED matrix
 		rotation = rotation + 90
 	#ap.set_rotation(rotation)
 	uh.rotation(rotation)
+	play()
 
 def handleClick():
 
@@ -193,7 +194,7 @@ def drawEverything():
 	screen.blit(text, (5,10))  # done
 	fps_text = 'Frame rate= ' + str(fps) +' fps'
 	text = font.render(fps_text,1,(255,255,255))
-	screen.blit(text, (145,10)) # done
+	screen.blit(text, (175,10)) # done
 	font = pygame.font.Font(None,18)
 	export_text = 'Animation' # done
 	text = font.render(export_text,1,(255,255,255))
@@ -308,6 +309,7 @@ def play():
 							led.lit = True
 		piLoad()
 		time.sleep(1.0/fps)
+	frame_number = len(animation)
 
 def faster():
 	global fps
@@ -409,6 +411,7 @@ def importAni():
 
 			y = int(counter-1)/8
 			x = int(counter-1)%8
+			#print(counter,x,y)
 
 			#print(str(counter) + ' ' + f + ' x= ' + str(x) + ' y= ' + str(y))
 			led = LED(radius=20,pos=(x, y))
@@ -447,9 +450,9 @@ buttons.append(clearButton)
 quitButton = Button('Quit', action=quit,  pos=(425, 290), color=(96,96,96))
 buttons.append(quitButton)
 
-FasterButton = Button('+', action=faster, size=(45,30), pos=(245, 5), color=(184,138,0)) # done
+FasterButton = Button('+', action=faster, size=(40,30), pos=(270, 5), color=(184,138,0)) # done
 buttons.append(FasterButton)
-SlowerButton = Button('-', action=slower, size=(45,30), pos=(295, 5), color=(184,138,0))# done
+SlowerButton = Button('-', action=slower, size=(40,30), pos=(315, 5), color=(184,138,0))# done
 buttons.append(SlowerButton)
 
 PlayButton = Button('Play on LEDs', action=play,  pos=(425, 340), color=(184,138,0)) # done
@@ -474,12 +477,12 @@ buttons.append(PinkButton)
 WhiteButton = Button('', action=setColourWhite, size=(50,30), pos=(365, 290),hilight=(0, 200, 200),color=(255,255,255)) # done
 buttons.append(WhiteButton)
 
-PrevFrameButton = Button('<-', action=prevFrame, size=(30,30), pos=(55, 5), color=(184,138,0)) # done
+PrevFrameButton = Button('<-', action=prevFrame, size=(25,30), pos=(50, 5), color=(184,138,0)) # done
 buttons.append(PrevFrameButton)
-NextFrameButton = Button('->', action=nextFrame, size=(30,30), pos=(95, 5), color=(184,138,0)) # done
+NextFrameButton = Button('->', action=nextFrame, size=(25,30), pos=(80, 5), color=(184,138,0)) # done
 buttons.append(NextFrameButton)
 
-DelFrame = Button('Delete', action=delFrame, size=(50,25), pos=(365, 415), color=(184,138,0)) # done
+DelFrame = Button('Delete', action=delFrame, size=(45,25), pos=(115, 7), color=(184,138,0)) # done
 buttons.append(DelFrame)
 
 saveButton = Button('Save', action=save_it, size=(60,50), pos=(150, 250),hilight=(200, 0, 0),color=(255,255,0)) # done

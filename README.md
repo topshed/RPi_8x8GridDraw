@@ -1,6 +1,6 @@
 # 8x8GridDraw
 
-These Python Pygame applications are for creating 8x8 pixel images and animations for loading onto either a Raspberry Pi [Sense HAT] (https://www.raspberrypi.org/blog/buy-the-sense-hat-as-seen-in-space/) (as used on the Astro Pi)  or [UnicornHat] (http://shop.pimoroni.com/products/unicorn-hat) LED matrix.
+These Python Pygame applications are for creating 8x8 pixel images and animations for loading onto either a Raspberry Pi [Sense HAT] (https://www.raspberrypi.org/blog/buy-the-sense-hat-as-seen-in-space/) (as used on the Astro Pi), [UnicornHat] (http://shop.pimoroni.com/products/unicorn-hat) or [UnicornPHAT] (https://shop.pimoroni.com/products/unicorn-phat) LED matrix.
 
 ![alt tag](https://raw.githubusercontent.com/topshed/RPi_8x8GridDraw/master/GUI.png)
 
@@ -20,7 +20,7 @@ See my [blog] (http://richardhayler.blogspot.com/2015/06/creating-images-for-ast
 ### Getting started
 
 1. Run startx then open a terminal window.
-2. Run 8x8grid.py. This will detect which kind of HAT you have and run the appropriate sub-program ( 8x8grid-unicorn for UnicornHat) or 8x8grid-sense.py (for Sense HAT). You can, of course, just run either one directly. 
+2. Run 8x8grid.py. This will detect which kind of HAT you have and run the appropriate sub-program ( 8x8grid-unicorn for UnicornHat) or 8x8grid-sense.py (for Sense HAT). If you are using a Unicorn PHAT, type 'y' when asked and 8x8grid-unicornphat will be run. . You can, of course, just run either program directly. 
 
 This Python program uses pygame and the Sense/UnicornHAT APIs to create and edit single frames or multi-frame animations. The animations can be exported as Python code or a single frame can be saved as an 8x8 png.
 
@@ -75,14 +75,15 @@ The '**Play on LEDs**' button will load the image you have created onto the LED 
 
 To increase or decrease the speed at which the animation is played on the LED matrix, use the **+** and **–** buttons. You should the Frames per Second (FPS) value change accordingly. Note that this will also alter the frame-rate set in the exported .py file (default is 1 fps).
 
+The '**Rotate LEDs**' button will rotate the image displayed on the LEDs by 90 degrees clockwise for SenseHAT and UnicornHAT and 180 degrees for UnicornPHAT. It will not alter the orientation of the image within the editor.
 
-The '**Rotate LEDs**' button will rotate the image displayed on the LEDs by 90 degrees clockwise. It will not alter the orientation of the image within the editor.
+![alt tag](https://raw.githubusercontent.com/topshed/RPi_8x8GridDraw/master/GUI-phat.png)
 
 As mentioned earlier, the '**Clear Grid**' button will set all the LEDs on the screen to off (this will not affect any image loaded on to the LED matrix).
 
 The '**Delete**' button will remove the current frame and set the displayed frame to be the previous on in the series (e.g. if you're editing frame 6 and press the '**Delete**' button, you will set the current frame to number 5).
 
-The '**QUit**' button will exit the program.
+The '**Quit**' button will exit the program.
 
 ###Colour Definitions:
 

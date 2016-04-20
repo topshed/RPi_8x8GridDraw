@@ -19,4 +19,10 @@ if os.path.isfile("/proc/device-tree/hat/product"):
 		sys.exit()
 else:
 	print('No HAT detected')
-	sys.exit()
+	answer = input('Do you have a Unicorn Phat (y/n)?')
+	if answer == 'y':
+		print('Configuring for Unicorn Phat')
+		mypath = os.path.dirname(os.path.abspath(__file__))
+		os.system("/usr/bin/env python " + mypath+"/8x8grid-unicornphat.py")
+	else:
+		sys.exit()
