@@ -125,7 +125,7 @@ def exportGrid(): # Writes png to file
 
 	global saved
 	grid, png_grid = buildGrid()
-	FILE=open('image8x8.png','wb')
+	FILE=open('image8x8.png','w')
 	w = png.Writer(8,8)
 	w.write(FILE,png_grid)
 	FILE.close()
@@ -323,7 +323,7 @@ def slower():
 def exportAni():
 
 	global saved
-	FILE=open('animation8x8.py','wb')
+	FILE=open('animation8x8.py','w')
 	FILE.write('import unicornhat as uh\n')
 	FILE.write('import time\n')
 	FILE.write('FRAMES = [\n')
