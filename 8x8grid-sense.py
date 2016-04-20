@@ -114,7 +114,7 @@ def exportGrid(): # Writes png to file
 
 	global saved
 	grid, png_grid = buildGrid()
-	FILE=open('image8x8.png','w')
+	FILE=open('image8x8.png','wb')
 	w = png.Writer(8,8)
 	w.write(FILE,png_grid)
 	FILE.close()
