@@ -106,8 +106,8 @@ def delete_frame():
     
 def load_frame():
     #print(frames[current_frame_number])
-    print(current_frame_number)
-    print(frames)
+    #print(current_frame_number)
+    #print(frames)
     frame_status_text.value=("Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3))
     #print(blank_frame)
     sh.set_pixels(frames[current_frame_number])
@@ -142,11 +142,12 @@ def go_start():
 def play():
     global current_frame_number
     print(current_frame_number)
-    t = 1000
+    t =  int(1000/framerate)
     for i in range(len(frames)):
         frame_status_text.after(t*i,right)
 
 def export_python():
+    global framerate
     with open("/home/pi/animation.py","w") as export_file:
         export_file.write("from sense_hat import SenseHat\n")
         export_file.write("from time import sleep\n")
@@ -154,7 +155,11 @@ def export_python():
         export_file.write("sh.clear(0,0,0)\n")
         for e in range(1,len(frames)):
             export_file.write("sh.set_pixels(" +str(frames[e]) + ")\n")
-            export_file.write("sleep(1)\n")
+            export_file.write("sleep(1/"+str(framerate) +")\n")
+            
+def set_framerate():
+    global framerate
+    framerate = slider_framerate.value
 
 app = App(layout="grid")
 matrix = Waffle(app,height=8,width=8,dim=30,command=p_clicked,color="black",grid=[0,0,7,7])
@@ -182,8 +187,10 @@ button_left = PushButton(app, command=left,grid=[1,11,2,1], text = "<")
 button_play = PushButton(app, command=play,grid=[2,11,2,1], text = "PLAY")
 button_right = PushButton(app, command=right,grid=[3,11,2,1], text = ">")
 button_go_end = PushButton(app, command=go_end,grid=[4,11,2,1], text = ">>")
-button_export_python = PushButton(app, command=export_python,grid=[5,11,4,1], text = "Export Python")
 
+slider_framerate = Slider(app, command=set_framerate, grid=[6,11,5,1],start=1, end=25)
 
+button_export_python = PushButton(app, command=export_python,grid=[0,12,4,1], text = "Export Python")
 app.display()
+
 
