@@ -36,7 +36,7 @@ def col_select(x,y):
         col = (255,255,0)
         button_clear.text_color = "black"
     elif y == 4:
-        col = (0,0,0)
+        col = (80,80,80)
         button_clear.text_color = "white"
     elif y == 5:
         col = (255,255,255)
@@ -51,12 +51,20 @@ def col_select(x,y):
     box.bg =col
     button_clear.bg = col
 
+def hex_to_rgb(hex):
+    return(tuple(int(hex[i:i+2],16) for i in (0,2,4)))
 
 def p_clicked(x,y):
-    print(x,y)
-    matrix.set_pixel(x,y,col)
+    print(x,y,col,matrix.get_pixel(x,y) )
+    if matrix.get_pixel(x,y) == "black":
+        matrix.set_pixel(x,y,col)
+    elif hex_to_rgb(str(matrix.get_pixel(x,y).strip('#'))) == col:
+        matrix.set_pixel(x,y,"black")
+    else:
+        matrix.set_pixel(x,y,col)
     sh.set_pixel(x,y,col)
     frames[current_frame_number][(y*8)+x] = col 
+        
     #print(frames)
     
 def clear_matrix():
@@ -168,11 +176,28 @@ def left():
     
 def right():
     global current_frame_number
+    if current_frame_number < len(frames):
+        current_frame_number +=1
+        load_frame()
+
+def right_play():
+    global current_frame_number
     global stopped
     if (current_frame_number < len(frames)) and not stopped:
         current_frame_number +=1
         load_frame()
-    
+    if current_frame_number == len(frames) and not stopped:
+
+        button_play.enable()
+        button_stop.disable()
+        slider_framerate.enable()
+        if checkbox_repeat.value == 1:
+            current_frame_number = 0
+            play()
+        else:
+            stopped = True
+            
+        
 def go_end():
     global current_frame_number
     global frames
@@ -186,20 +211,24 @@ def go_start():
     
 
 def play():
+    print("playing")
     button_play.disable()
     button_stop.enable()
+    slider_framerate.disable()
     global stopped
     global current_frame_number
     #print(current_frame_number)
     stopped = False
     t =  int(1000/framerate)
-    for i in range(len(frames)):
-            frame_status_text.after(t*i,right)
+    for i in range(1,len(frames)):
+            frame_status_text.after(t*i,right_play)
 
         
 def stop():
     global stopped
     stopped = True
+    button_play.enable()
+    button_stop.disable()
     
 
 def export_python():
@@ -239,7 +268,7 @@ palette.set_pixel(0, 0, "red")
 palette.set_pixel(0,1, (0,255,0))
 palette.set_pixel(0,2, "blue")
 palette.set_pixel(0,3, "yellow")
-palette.set_pixel(0,4, "black")
+palette.set_pixel(0,4, (100,100,100))
 palette.set_pixel(0,5, "white")
 palette.set_pixel(0,6, (255,0,255))
 palette.set_pixel(0,7, "orange")
