@@ -1,5 +1,5 @@
 # Write your code here :-)
-from guizero import App, PushButton, Slider, Waffle, Box,Text
+from guizero import App, PushButton, Slider, Waffle, Box,Text, Combo,CheckBox
 from sense_hat import SenseHat
 from time import sleep
 
@@ -114,6 +114,51 @@ def load_frame():
     for x in range(8):
         for y in range(8):
             matrix.set_pixel(x,y,frames[current_frame_number][(y*8)+x])
+    load_other_frames()
+            
+def load_other_frames():
+    prev_matrix.color="black"
+    next_matrix.color="black"
+    if len(frames) == 2:
+        if current_frame_number == 1:
+            for x in range(8):
+                for y in range(8):
+                    next_matrix.set_pixel(x,y,frames[current_frame_number+1][(y*8)+x])
+            for x in range(8):
+                for y in range(8):
+                    prev_matrix.set_pixel(x,y,"grey")                  
+        else:
+            for x in range(8):
+                for y in range(8):
+                    prev_matrix.set_pixel(x,y,frames[current_frame_number-1][(y*8)+x])
+            for x in range(8):
+                for y in range(8):
+                    next_matrix.set_pixel(x,y,"grey")   
+                
+    if len(frames) >= 3:
+        if current_frame_number == 1:
+            for x in range(8):
+                for y in range(8):
+                    next_matrix.set_pixel(x,y,frames[current_frame_number+1][(y*8)+x])
+            for x in range(8):
+                for y in range(8):
+                    prev_matrix.set_pixel(x,y,"grey")                  
+        elif current_frame_number == len(frames):
+            for x in range(8):
+                for y in range(8):
+                    prev_matrix.set_pixel(x,y,frames[current_frame_number-1][(y*8)+x])
+            for x in range(8):
+                for y in range(8):
+                    next_matrix.set_pixel(x,y,"grey")
+        else:
+            for x in range(8):
+                for y in range(8):
+                    next_matrix.set_pixel(x,y,frames[current_frame_number+1][(y*8)+x])
+            for x in range(8):
+                for y in range(8):
+                    prev_matrix.set_pixel(x,y,frames[current_frame_number-1][(y*8)+x])                 
+
+
         
 def left():
     global current_frame_number
@@ -123,7 +168,8 @@ def left():
     
 def right():
     global current_frame_number
-    if current_frame_number < len(frames):
+    global stopped
+    if (current_frame_number < len(frames)) and not stopped:
         current_frame_number +=1
         load_frame()
     
@@ -140,11 +186,21 @@ def go_start():
     
 
 def play():
+    button_play.disable()
+    button_stop.enable()
+    global stopped
     global current_frame_number
-    print(current_frame_number)
+    #print(current_frame_number)
+    stopped = False
     t =  int(1000/framerate)
     for i in range(len(frames)):
-        frame_status_text.after(t*i,right)
+            frame_status_text.after(t*i,right)
+
+        
+def stop():
+    global stopped
+    stopped = True
+    
 
 def export_python():
     global framerate
@@ -160,37 +216,55 @@ def export_python():
 def set_framerate():
     global framerate
     framerate = slider_framerate.value
+    
+def sh_rotation():
+    sh.set_rotation(int(combo_rotation.value))
+    print(combo_rotation.value)
 
-app = App(layout="grid")
-matrix = Waffle(app,height=8,width=8,dim=30,command=p_clicked,color="black",grid=[0,0,7,7])
-palette = Waffle(app,height=8, width=1, dim =25, command = col_select,grid=[8,0,1,7])
+app = App(layout="grid",height=600, width=500)
+box_top = Box(app, layout="grid", grid=[0,0,5,1])
+button_go_start = PushButton(box_top, command=go_start,grid=[0,0,2,1], text = "<<")
+button_left = PushButton(box_top, command=left,grid=[2,0,2,1], text = "<")
+button_play = PushButton(box_top, command=play,grid=[4,0,2,1], text = "PLAY")
+button_stop = PushButton(box_top, command=stop,grid=[6,0,2,1], text = "STOP",enabled=False)
+button_right = PushButton(box_top, command=right,grid=[8,0,2,1], text = ">")
+button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>")
+checkbox_repeat = CheckBox(app, text=" Repeat",grid=[6,0,1,1])
+slider_framerate = Slider(app, command=set_framerate, grid=[7,0,2,1],start=1, end=25)
+
+
+matrix = Waffle(app,height=8,width=8,dim=30,command=p_clicked,color="black",grid=[0,1,7,7])
+palette = Waffle(app,height=8, width=1, dim =25, command = col_select,grid=[7,1,1,7])
 palette.set_pixel(0, 0, "red")
-palette.set_pixel(0,1, "green")
+palette.set_pixel(0,1, (0,255,0))
 palette.set_pixel(0,2, "blue")
 palette.set_pixel(0,3, "yellow")
 palette.set_pixel(0,4, "black")
 palette.set_pixel(0,5, "white")
-palette.set_pixel(0,6, "pink")
+palette.set_pixel(0,6, (255,0,255))
 palette.set_pixel(0,7, "orange")
-box = Box(app, width=30,height=30,grid=[3,9,2,1])
+box = Box(app, width=30,height=30,grid=[2,10,2,1])
 box.bg =col
-text_current_col = Text(app, text="Selected Colour:", grid=[0,9,3,1])
-button_clear = PushButton(app, command=clear_matrix,grid=[9,0], text = "Clear")
+text_current_col = Text(app, text="Selected Colour:", grid=[0,10,3,1])
+text_rotation = Text(app, text="LED Rotation:", grid=[5,10,3,1])
+combo_rotation = Combo(app, options=["0", "90", "180", "270"],grid=[8,10,2,1],command=sh_rotation)
+
+button_clear = PushButton(app, command=clear_matrix,grid=[8,1], text = "Clear")
 button_clear.bg = col
 
-frame_status_text = Text(app, text="Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3), grid=[0,10,3,1])
-button_new_frame = PushButton(app, command=new_frame,grid=[3,10,3,1], text = "New Frame")
-button_new_frame = PushButton(app, command=copy_frame,grid=[6,10,3,1], text = "Copy Frame")
-button_new_frame = PushButton(app, command=delete_frame,grid=[9,10,3,1], text = "Delete Frame")
-button_go_start = PushButton(app, command=go_start,grid=[0,11,2,1], text = "<<")
-button_left = PushButton(app, command=left,grid=[1,11,2,1], text = "<")
-button_play = PushButton(app, command=play,grid=[2,11,2,1], text = "PLAY")
-button_right = PushButton(app, command=right,grid=[3,11,2,1], text = ">")
-button_go_end = PushButton(app, command=go_end,grid=[4,11,2,1], text = ">>")
 
-slider_framerate = Slider(app, command=set_framerate, grid=[6,11,5,1],start=1, end=25)
+frame_status_text = Text(app, text="Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3), grid=[0,11,3,1])
+button_new_frame = PushButton(app, command=new_frame,grid=[3,11,2,1], text = "New Frame")
+button_new_frame = PushButton(app, command=copy_frame,grid=[6,11,2,1], text = "Copy Frame")
+button_new_frame = PushButton(app, command=delete_frame,grid=[8,11,2,1], text = "Delete Frame")
 
 button_export_python = PushButton(app, command=export_python,grid=[0,12,4,1], text = "Export Python")
+
+prev_matrix = Waffle(app,height=8,width=8,dim=8,color="grey",grid=[0,13,3,3])
+next_matrix = Waffle(app,height=8,width=8,dim=8,color="grey",grid=[7,13,3,3])
+
+
+
 app.display()
 
 
