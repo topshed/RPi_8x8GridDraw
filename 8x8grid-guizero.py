@@ -1,7 +1,8 @@
 # Write your code here :-)
-from guizero import App, PushButton, Slider, Waffle, Box,Text, Combo,CheckBox
+from guizero import App, PushButton, Slider, Waffle, Box,Text, Combo,CheckBox, yesno, info, error, MenuBar
 from sense_hat import SenseHat
 from time import sleep
+import ast
 
 sh = SenseHat()
 
@@ -47,6 +48,10 @@ def col_select(x,y):
     elif y == 7:
         col = (255,150,0)
         button_clear.text_color = "black"
+        button_clear.text_color = "black"
+    elif y == 8:
+        col = (0,0,0)
+        button_clear.text_color = "white"
     #print(col)
     box.bg =col
     button_clear.bg = col
@@ -72,6 +77,7 @@ def clear_matrix():
     for x in range(8):
         for y in range(8):
             matrix.set_pixel(x,y,col)
+            frames[current_frame_number][(y*8)+x] = col
 
 def new_frame():
     global current_frame_number
@@ -113,8 +119,9 @@ def delete_frame():
     load_frame()
     
 def load_frame():
-    #print(frames[current_frame_number])
-    #print(current_frame_number)
+    print(frames[current_frame_number])
+    print(len(frames[current_frame_number]))
+    print(frames[current_frame_number][0])
     #print(frames)
     frame_status_text.value=("Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3))
     #print(blank_frame)
@@ -234,13 +241,46 @@ def stop():
 def export_python():
     global framerate
     with open("/home/pi/animation.py","w") as export_file:
+        export_file.write("# 8x8Grid Editor output file \n")
         export_file.write("from sense_hat import SenseHat\n")
         export_file.write("from time import sleep\n")
         export_file.write("sh = SenseHat()\n")
         export_file.write("sh.clear(0,0,0)\n")
-        for e in range(1,len(frames)):
+        for e in range(1,len(frames)+1):
             export_file.write("sh.set_pixels(" +str(frames[e]) + ")\n")
             export_file.write("sleep(1/"+str(framerate) +")\n")
+            
+def import_python():
+    global framerate
+    global current_frame_number
+    current_frame_number = 1
+    with open("/home/pi/animation.py","r") as import_file:
+        line1 = import_file.readline()
+        if line1 == "# 8x8Grid Editor output file \n":
+            print("This looks like an 8x8 Grid Editor file")
+            for line in import_file:
+                if line.startswith("sh.set_pixels"):
+                    grid = line[14:-2]
+                    print(grid)
+                    frames[current_frame_number] = ast.literal_eval(grid)
+                    current_frame_number+=1
+            print(frames)
+            current_frame_number-=1
+            load_frame()
+        else:
+            print("This doesn't look like an 8x8 Grid Editor file")
+            not_our_file = yesno("Uh-oh","This doesn't look like an 8x8 Grid Editor file. Carry on trying to import it?")
+            if not_our_file == True:
+                for line in import_file:
+                    if line.startswith("sh.set_pixels"):
+                        grid = line[14:-2]
+                        print(grid)
+                        frames[current_frame_number] = ast.literal_eval(grid)
+                        current_frame_number+=1
+                print(frames)
+                current_frame_number-=1
+                load_frame()
+                
             
 def set_framerate():
     global framerate
@@ -250,20 +290,20 @@ def sh_rotation():
     sh.set_rotation(int(combo_rotation.value))
     print(combo_rotation.value)
 
-app = App(layout="grid",height=600, width=500)
+app = App(title="8x8 Grid Editor",layout="grid",height=540, width=500)
 box_top = Box(app, layout="grid", grid=[0,0,5,1])
-button_go_start = PushButton(box_top, command=go_start,grid=[0,0,2,1], text = "<<")
+button_go_start = PushButton(box_top, command=go_start,grid=[0,0,2,1], text = "<<", image="/home/pi/start40.png")
 button_left = PushButton(box_top, command=left,grid=[2,0,2,1], text = "<")
-button_play = PushButton(box_top, command=play,grid=[4,0,2,1], text = "PLAY")
-button_stop = PushButton(box_top, command=stop,grid=[6,0,2,1], text = "STOP",enabled=False)
+button_play = PushButton(box_top, command=play,grid=[4,0,2,1], text = "PLAY", image="/home/pi/play40.png")
+button_stop = PushButton(box_top, command=stop,grid=[6,0,2,1], text = "STOP",enabled=False, image="/home/pi/stop40.png")
 button_right = PushButton(box_top, command=right,grid=[8,0,2,1], text = ">")
-button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>")
+button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>",image="/home/pi/end40.png")
 checkbox_repeat = CheckBox(app, text=" Repeat",grid=[6,0,1,1])
 slider_framerate = Slider(app, command=set_framerate, grid=[7,0,2,1],start=1, end=25)
 
 
 matrix = Waffle(app,height=8,width=8,dim=30,command=p_clicked,color="black",grid=[0,1,7,7])
-palette = Waffle(app,height=8, width=1, dim =25, command = col_select,grid=[7,1,1,7])
+palette = Waffle(app,height=9, width=1, dim =25, command = col_select,grid=[7,1,1,7])
 palette.set_pixel(0, 0, "red")
 palette.set_pixel(0,1, (0,255,0))
 palette.set_pixel(0,2, "blue")
@@ -272,6 +312,7 @@ palette.set_pixel(0,4, (100,100,100))
 palette.set_pixel(0,5, "white")
 palette.set_pixel(0,6, (255,0,255))
 palette.set_pixel(0,7, "orange")
+palette.set_pixel(0,8, "black")
 box = Box(app, width=30,height=30,grid=[2,10,2,1])
 box.bg =col
 text_current_col = Text(app, text="Selected Colour:", grid=[0,10,3,1])
@@ -284,14 +325,20 @@ button_clear.bg = col
 
 frame_status_text = Text(app, text="Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3), grid=[0,11,3,1])
 button_new_frame = PushButton(app, command=new_frame,grid=[3,11,2,1], text = "New Frame")
-button_new_frame = PushButton(app, command=copy_frame,grid=[6,11,2,1], text = "Copy Frame")
-button_new_frame = PushButton(app, command=delete_frame,grid=[8,11,2,1], text = "Delete Frame")
+button_new_frame = PushButton(app, command=copy_frame,grid=[5,11,2,1], text = "Copy Frame")
+button_new_frame = PushButton(app, command=delete_frame,grid=[7,11,2,1], text = "Delete Frame")
 
-button_export_python = PushButton(app, command=export_python,grid=[0,12,4,1], text = "Export Python")
+#button_export_python = PushButton(app, command=export_python,grid=[0,12,3,1], text = "Export Python")
+#button_import_python = PushButton(app, command=import_python,grid=[3,12,4,1], text = "Import Python")
 
 prev_matrix = Waffle(app,height=8,width=8,dim=8,color="grey",grid=[0,13,3,3])
 next_matrix = Waffle(app,height=8,width=8,dim=8,color="grey",grid=[7,13,3,3])
 
+menubar = MenuBar(app,
+                  toplevel=["File"],
+                  options=[
+                      [ ["Import Python file", import_python], ["Export Python file", export_python] ]
+                  ])
 
 
 app.display()
