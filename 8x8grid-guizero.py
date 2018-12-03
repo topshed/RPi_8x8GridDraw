@@ -21,6 +21,7 @@ blank_frame = [(0,0,0), (0,0,0), (0,0,0), (0,0,0),(0,0,0), (0,0,0),(0,0,0), (0,0
 frames = {1:blank_frame.copy()}
 current_frame_number =1
 framerate =  1 # frames per second
+looping = False
 
 def col_select(x,y):
     global col
@@ -52,7 +53,6 @@ def col_select(x,y):
     elif y == 8:
         col = (0,0,0)
         button_clear.text_color = "white"
-    #print(col)
     box.bg =col
     button_clear.bg = col
 
@@ -60,17 +60,21 @@ def hex_to_rgb(hex):
     return(tuple(int(hex[i:i+2],16) for i in (0,2,4)))
 
 def p_clicked(x,y):
-    print(x,y,col,matrix.get_pixel(x,y) )
-    if matrix.get_pixel(x,y) == "black":
-        matrix.set_pixel(x,y,col)
-    elif hex_to_rgb(str(matrix.get_pixel(x,y).strip('#'))) == col:
-        matrix.set_pixel(x,y,"black")
-    else:
-        matrix.set_pixel(x,y,col)
-    sh.set_pixel(x,y,col)
-    frames[current_frame_number][(y*8)+x] = col 
-        
-    #print(frames)
+    if (x <= 7) and (y <= 7):
+        print(x,y,col,matrix.get_pixel(x,y) )
+        if matrix.get_pixel(x,y) == "black":
+            matrix.set_pixel(x,y,col)
+            sh.set_pixel(x,y,col)
+            frames[current_frame_number][(y*8)+x] = col
+        elif hex_to_rgb(str(matrix.get_pixel(x,y).strip('#'))) == col:
+            matrix.set_pixel(x,y,"black")
+            sh.set_pixel(x,y,(0,0,0))
+            frames[current_frame_number][(y*8)+x] = (0,0,0)        
+        else:
+            matrix.set_pixel(x,y,col)
+            sh.set_pixel(x,y,col)
+            frames[current_frame_number][(y*8)+x] = col 
+
     
 def clear_matrix():
     sh.clear(col)
@@ -119,9 +123,9 @@ def delete_frame():
     load_frame()
     
 def load_frame():
-    print(frames[current_frame_number])
-    print(len(frames[current_frame_number]))
-    print(frames[current_frame_number][0])
+    #print(frames[current_frame_number])
+    #print(len(frames[current_frame_number]))
+    #print(frames[current_frame_number][0])
     #print(frames)
     frame_status_text.value=("Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3))
     #print(blank_frame)
@@ -190,16 +194,24 @@ def right():
 def right_play():
     global current_frame_number
     global stopped
+    global looping
+    print(current_frame_number)
     if (current_frame_number < len(frames)) and not stopped:
         current_frame_number +=1
         load_frame()
-    if current_frame_number == len(frames) and not stopped:
+    if (current_frame_number == len(frames)) and not stopped:
 
         button_play.enable()
         button_stop.disable()
         slider_framerate.enable()
+        button_go_end.enable()
+        button_go_start.enable()
+        button_left.enable()
+        button_right.enable()
         if checkbox_repeat.value == 1:
+            looping = True
             current_frame_number = 0
+            print("repeating")
             play()
         else:
             stopped = True
@@ -218,17 +230,29 @@ def go_start():
     
 
 def play():
-    print("playing")
-    button_play.disable()
-    button_stop.enable()
-    slider_framerate.disable()
     global stopped
     global current_frame_number
-    #print(current_frame_number)
-    stopped = False
-    t =  int(1000/framerate)
-    for i in range(1,len(frames)):
-            frame_status_text.after(t*i,right_play)
+    global looping
+    if len(frames) > 1:
+        print("playing")
+        button_play.disable()
+        button_stop.enable()
+        button_go_end.disable()
+        button_go_start.disable()
+        button_go_end.disable()
+        button_left.disable()
+        button_right.disable()
+        slider_framerate.disable()
+
+        #print(current_frame_number)
+        stopped = False
+        t =  int(1000/framerate)
+        if looping:
+            for i in range(1,len(frames)+1): # because we set current_frame_number = 0 when looping we need an extra iteration
+                    frame_status_text.after(t*i,right_play)
+        else:  
+            for i in range(1,len(frames)):
+                    frame_status_text.after(t*i,right_play)
 
         
 def stop():
@@ -236,6 +260,12 @@ def stop():
     stopped = True
     button_play.enable()
     button_stop.disable()
+    slider_framerate.enable()
+    button_go_end.enable()
+    button_go_start.enable()
+    button_left.enable()
+    button_right.enable()
+
     
 
 def export_python():
@@ -292,12 +322,12 @@ def sh_rotation():
 
 app = App(title="8x8 Grid Editor",layout="grid",height=540, width=500)
 box_top = Box(app, layout="grid", grid=[0,0,5,1])
-button_go_start = PushButton(box_top, command=go_start,grid=[0,0,2,1], text = "<<", image="/home/pi/start40.png")
-button_left = PushButton(box_top, command=left,grid=[2,0,2,1], text = "<")
-button_play = PushButton(box_top, command=play,grid=[4,0,2,1], text = "PLAY", image="/home/pi/play40.png")
-button_stop = PushButton(box_top, command=stop,grid=[6,0,2,1], text = "STOP",enabled=False, image="/home/pi/stop40.png")
-button_right = PushButton(box_top, command=right,grid=[8,0,2,1], text = ">")
-button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>",image="/home/pi/end40.png")
+button_go_start = PushButton(box_top, command=go_start,grid=[0,0,2,1], text = "<<", image="/home/pi/RPi_8x8GridDraw/images/endl.png")
+button_left = PushButton(box_top, command=left,grid=[2,0,2,1], text = "<",image="/home/pi/RPi_8x8GridDraw/images/left.png")
+button_play = PushButton(box_top, command=play,grid=[4,0,2,1], text = "PLAY", image="/home/pi/RPi_8x8GridDraw/images/play.png")
+button_stop = PushButton(box_top, command=stop,grid=[6,0,2,1], text = "STOP",enabled=False, image="/home/pi/RPi_8x8GridDraw/images/stop.png")
+button_right = PushButton(box_top, command=right,grid=[8,0,2,1], text = ">",image="/home/pi/RPi_8x8GridDraw/images/right.png")
+button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>",image="/home/pi/RPi_8x8GridDraw/images/endr.png")
 checkbox_repeat = CheckBox(app, text=" Repeat",grid=[6,0,1,1])
 slider_framerate = Slider(app, command=set_framerate, grid=[7,0,2,1],start=1, end=25)
 
