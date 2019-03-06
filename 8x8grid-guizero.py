@@ -1,12 +1,20 @@
 # Write your code here :-)
-from guizero import App, PushButton, Slider, Waffle, Box,Text, Combo,CheckBox, yesno, info, error, MenuBar
+from guizero import App, PushButton, Slider, Waffle, Box,Text, Combo,CheckBox, yesno, info, error, MenuBar, warn
 from sense_hat import SenseHat
 from time import sleep
 import ast
 
-sh = SenseHat()
+import os, sys
 
-sh.clear(0,0,0)
+NOHAT = False
+def no_hat_check():
+    global NOHAT
+    no_hat = yesno("No SenseHAT detected", "Do you want to carry on anyway?")
+    if no_hat:
+        NOHAT = True
+        pass
+    else:
+        sys.exit()
 
 col = (255,255,255)
 blank_frame = [(0,0,0), (0,0,0), (0,0,0), (0,0,0),(0,0,0), (0,0,0),(0,0,0), (0,0,0),
@@ -23,6 +31,14 @@ current_frame_number =1
 framerate =  1 # frames per second
 looping = False
 
+def illum_pixel(x,y):
+    global col
+    global NOHAT
+    matrix.set_pixel(x,y,col)
+    if not NOHAT:
+        sh.set_pixel(x,y,col)
+    
+    
 def col_select(x,y):
     global col
     if y == 0:
@@ -63,25 +79,31 @@ def p_clicked(x,y):
     if (x <= 7) and (y <= 7):
         print(x,y,col,matrix.get_pixel(x,y) )
         if matrix.get_pixel(x,y) == "black":
-            matrix.set_pixel(x,y,col)
-            sh.set_pixel(x,y,col)
+            #matrix.set_pixel(x,y,col)
+            #sh.set_pixel(x,y,col)
+            illum_pixel(x,y)
             frames[current_frame_number][(y*8)+x] = col
         elif hex_to_rgb(str(matrix.get_pixel(x,y).strip('#'))) == col:
-            matrix.set_pixel(x,y,"black")
-            sh.set_pixel(x,y,(0,0,0))
+            #matrix.set_pixel(x,y,"black")
+            #sh.set_pixel(x,y,(0,0,0))
+            illum_pixel(x,y)
             frames[current_frame_number][(y*8)+x] = (0,0,0)        
         else:
-            matrix.set_pixel(x,y,col)
-            sh.set_pixel(x,y,col)
+            #matrix.set_pixel(x,y,col)
+            #sh.set_pixel(x,y,col)
+            illum_pixel(x,y)
             frames[current_frame_number][(y*8)+x] = col 
 
     
 def clear_matrix():
-    sh.clear(col)
+    global NOHAT
+    if not NOHAT:
+        sh.clear(col)
     for x in range(8):
         for y in range(8):
             matrix.set_pixel(x,y,col)
             frames[current_frame_number][(y*8)+x] = col
+           
 
 def new_frame():
     global current_frame_number
@@ -115,21 +137,29 @@ def delete_frame():
     global current_frame_number
     global frames
     global blank_frame
-    if current_frame_number != len(frames): # not last frame
-        for f in range(current_frame_number, len(frames)):
-            frames[f] = frames[f+1].copy()
-    #print(current_frame_number, len(frames))
-    del frames[len(frames)]
-    load_frame()
+    if current_frame_number != 1:
+        if current_frame_number != len(frames): # not last frame
+            for f in range(current_frame_number, len(frames)):
+                frames[f] = frames[f+1].copy()
+        #print(current_frame_number, len(frames))
+        current_frame_number-=1
+        del frames[len(frames)]
+     
+        load_frame()
+    else:
+        warn("Heads up", "Only one frame exits - you can't delete it")
+        
     
 def load_frame():
+    global NOHAT
     #print(frames[current_frame_number])
     #print(len(frames[current_frame_number]))
     #print(frames[current_frame_number][0])
     #print(frames)
     frame_status_text.value=("Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3))
     #print(blank_frame)
-    sh.set_pixels(frames[current_frame_number])
+    if not NOHAT:
+        sh.set_pixels(frames[current_frame_number])
     for x in range(8):
         for y in range(8):
             matrix.set_pixel(x,y,frames[current_frame_number][(y*8)+x])
@@ -349,14 +379,15 @@ text_current_col = Text(app, text="Selected Colour:", grid=[0,10,3,1])
 text_rotation = Text(app, text="LED Rotation:", grid=[5,10,3,1])
 combo_rotation = Combo(app, options=["0", "90", "180", "270"],grid=[8,10,2,1],command=sh_rotation)
 
+
 button_clear = PushButton(app, command=clear_matrix,grid=[8,1], text = "Clear")
 button_clear.bg = col
 
 
 frame_status_text = Text(app, text="Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3), grid=[0,11,3,1])
-button_new_frame = PushButton(app, command=new_frame,grid=[3,11,2,1], text = "New Frame")
-button_new_frame = PushButton(app, command=copy_frame,grid=[5,11,2,1], text = "Copy Frame")
-button_new_frame = PushButton(app, command=delete_frame,grid=[7,11,2,1], text = "Delete Frame")
+button_new_frame = PushButton(app, command=new_frame,grid=[3,11,2,1], text = "New",padx=28)
+button_new_frame = PushButton(app, command=copy_frame,grid=[5,11,2,1], text = "Duplicate")
+button_new_frame = PushButton(app, command=delete_frame,grid=[7,11,2,1], text = "Delete", padx=20)
 
 #button_export_python = PushButton(app, command=export_python,grid=[0,12,3,1], text = "Export Python")
 #button_import_python = PushButton(app, command=import_python,grid=[3,12,4,1], text = "Import Python")
@@ -369,7 +400,25 @@ menubar = MenuBar(app,
                   options=[
                       [ ["Import Python file", import_python], ["Export Python file", export_python] ]
                   ])
-
+if os.path.isfile("/proc/device-tree/hat/product"):
+    file = open("/proc/device-tree/hat/product","r")
+    hat = file.readline()
+    if  hat == "Sense HAT\x00":
+        print('Sense HAT detected')
+        file.close()
+    else:
+        print("No SenseHAT detected")
+        no_hat_check()
+else:
+    print("No SenseHAT detected")
+    no_hat_check()
+    
+if not NOHAT:        
+    sh = SenseHat()
+    sh.clear(0,0,0)
+else:
+    text_rotation.disable()
+    combo_rotation.disable()
 
 app.display()
 
