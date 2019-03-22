@@ -1,18 +1,26 @@
 # Write your code here :-)
 from guizero import App, PushButton, Slider, Waffle, Box,Text, Combo,CheckBox, yesno, info, error, MenuBar, warn
-from sense_hat import SenseHat
+import os
 from time import sleep
 import ast
+from tkinter import filedialog
+from pathlib import Path
+
+HOME = str(Path.home())
 
 import os, sys
 
 NOHAT = False
+ONEMU = False
+
 def no_hat_check():
     global NOHAT
-    no_hat = yesno("No SenseHAT detected", "Do you want to carry on anyway?")
-    if no_hat:
-        NOHAT = True
-        pass
+    global ONEMU
+    NOHAT = yesno("No SenseHAT detected", "No SenseHat detected - Do you want to carry on anyway?")
+    if NOHAT:
+        if "arm" in  os.uname().machine: 
+            ONEMU = yesno("Looks like a Pi","Do you want to try to run in the SenseHat emulator?")      
+                
     else:
         sys.exit()
 
@@ -77,20 +85,15 @@ def hex_to_rgb(hex):
 
 def p_clicked(x,y):
     if (x <= 7) and (y <= 7):
-        print(x,y,col,matrix.get_pixel(x,y) )
+        
         if matrix.get_pixel(x,y) == "black":
-            #matrix.set_pixel(x,y,col)
-            #sh.set_pixel(x,y,col)
             illum_pixel(x,y)
             frames[current_frame_number][(y*8)+x] = col
         elif hex_to_rgb(str(matrix.get_pixel(x,y).strip('#'))) == col:
-            #matrix.set_pixel(x,y,"black")
-            #sh.set_pixel(x,y,(0,0,0))
-            illum_pixel(x,y)
+            matrix.set_pixel(x,y,"black")
+            sh.set_pixel(x,y,(0,0,0))
             frames[current_frame_number][(y*8)+x] = (0,0,0)        
         else:
-            #matrix.set_pixel(x,y,col)
-            #sh.set_pixel(x,y,col)
             illum_pixel(x,y)
             frames[current_frame_number][(y*8)+x] = col 
 
@@ -112,10 +115,7 @@ def new_frame():
     if current_frame_number != len(frames): # not last frame
         for f in range(len(frames), current_frame_number, -1):
             frames[f+1] = frames[f].copy()
-            #print("shuffling " + str(f) + " to " + str(f+1))
     frames[current_frame_number+1] = blank_frame.copy()
-
-    #print(current_frame_number, len(frames))
     current_frame_number +=1  
 
     load_frame()
@@ -127,8 +127,6 @@ def copy_frame():
         for f in range(len(frames), current_frame_number, -1):
             frames[f+1] = frames[f].copy()
     frames[current_frame_number+1] = frames[current_frame_number].copy()
-
-    #print(current_frame_number, len(frames))
     current_frame_number +=1  
 
     load_frame()
@@ -141,7 +139,6 @@ def delete_frame():
         if current_frame_number != len(frames): # not last frame
             for f in range(current_frame_number, len(frames)):
                 frames[f] = frames[f+1].copy()
-        #print(current_frame_number, len(frames))
         current_frame_number-=1
         del frames[len(frames)]
      
@@ -152,12 +149,7 @@ def delete_frame():
     
 def load_frame():
     global NOHAT
-    #print(frames[current_frame_number])
-    #print(len(frames[current_frame_number]))
-    #print(frames[current_frame_number][0])
-    #print(frames)
     frame_status_text.value=("Frame " + str(current_frame_number).zfill(3) + " of " + str(len(frames)).zfill(3))
-    #print(blank_frame)
     if not NOHAT:
         sh.set_pixels(frames[current_frame_number])
     for x in range(8):
@@ -225,7 +217,6 @@ def right_play():
     global current_frame_number
     global stopped
     global looping
-    print(current_frame_number)
     if (current_frame_number < len(frames)) and not stopped:
         current_frame_number +=1
         load_frame()
@@ -241,7 +232,6 @@ def right_play():
         if checkbox_repeat.value == 1:
             looping = True
             current_frame_number = 0
-            print("repeating")
             play()
         else:
             stopped = True
@@ -264,7 +254,6 @@ def play():
     global current_frame_number
     global looping
     if len(frames) > 1:
-        print("playing")
         button_play.disable()
         button_stop.enable()
         button_go_end.disable()
@@ -273,8 +262,6 @@ def play():
         button_left.disable()
         button_right.disable()
         slider_framerate.disable()
-
-        #print(current_frame_number)
         stopped = False
         t =  int(1000/framerate)
         if looping:
@@ -296,51 +283,61 @@ def stop():
     button_left.enable()
     button_right.enable()
 
-    
 
-def export_python():
+def export_as_python():
     global framerate
-    with open("/home/pi/animation.py","w") as export_file:
-        export_file.write("# 8x8Grid Editor output file \n")
-        export_file.write("from sense_hat import SenseHat\n")
-        export_file.write("from time import sleep\n")
-        export_file.write("sh = SenseHat()\n")
-        export_file.write("sh.clear(0,0,0)\n")
-        for e in range(1,len(frames)+1):
-            export_file.write("sh.set_pixels(" +str(frames[e]) + ")\n")
-            export_file.write("sleep(1/"+str(framerate) +")\n")
+    filename = filedialog.asksaveasfilename(initialdir = HOME, 
+                                        title = "Export file", 
+                                        filetypes = (("python files","*.py"),("all files","*.*")))
+    if len(filename) != 0:
+        with open(filename,"w") as export_file:
+            export_file.write("# 8x8Grid Editor output file \n")
+            export_file.write("from sense_hat import SenseHat\n")
+            export_file.write("from time import sleep\n")
+            export_file.write("sh = SenseHat()\n")
+            export_file.write("sh.clear(0,0,0)\n")
+            for e in range(1,len(frames)+1):
+                export_file.write("sh.set_pixels(" +str(frames[e]) + ")\n")
+                export_file.write("sleep(1/"+str(framerate) +")\n")
+            
+
             
 def import_python():
     global framerate
     global current_frame_number
     current_frame_number = 1
-    with open("/home/pi/animation.py","r") as import_file:
-        line1 = import_file.readline()
-        if line1 == "# 8x8Grid Editor output file \n":
-            print("This looks like an 8x8 Grid Editor file")
-            for line in import_file:
-                if line.startswith("sh.set_pixels"):
-                    grid = line[14:-2]
-                    print(grid)
-                    frames[current_frame_number] = ast.literal_eval(grid)
-                    current_frame_number+=1
-            print(frames)
-            current_frame_number-=1
-            load_frame()
-        else:
-            print("This doesn't look like an 8x8 Grid Editor file")
-            not_our_file = yesno("Uh-oh","This doesn't look like an 8x8 Grid Editor file. Carry on trying to import it?")
-            if not_our_file == True:
-                for line in import_file:
-                    if line.startswith("sh.set_pixels"):
-                        grid = line[14:-2]
-                        print(grid)
-                        frames[current_frame_number] = ast.literal_eval(grid)
-                        current_frame_number+=1
-                print(frames)
-                current_frame_number-=1
-                load_frame()
-                
+    filename = filedialog.askopenfilename(initialdir = HOME, 
+                                        title = "Select file", 
+                                        filetypes = (("python files","*.py"),("all files","*.*")))                                    
+    if len(filename) != 0:
+        with open(filename,"r") as import_file:
+            line1 = import_file.readline()
+            if line1 == "# 8x8Grid Editor output file \n":
+                #print("This looks like an 8x8 Grid Editor file")
+                try:
+                    for line in import_file:
+                        if line.startswith("sh.set_pixels"):
+                            grid = line[14:-2]
+                            frames[current_frame_number] = ast.literal_eval(grid)
+                            current_frame_number+=1
+                    current_frame_number-=1
+                    load_frame()
+                except:
+                    error("Import failed", "Sorry, that file could not be imported")
+            else:
+                not_our_file = yesno("Uh-oh","This doesn't look like an 8x8 Grid Editor file. Carry on trying to import it?")
+                if not_our_file == True:
+                    try:
+                        for line in import_file:
+                            if line.startswith("sh.set_pixels"):
+                                grid = line[14:-2]
+                                frames[current_frame_number] = ast.literal_eval(grid)
+                                current_frame_number+=1
+                        current_frame_number-=1
+                        load_frame()
+                    except:
+                        error("Import failed", "Sorry, that file could not be imported")
+                    
             
 def set_framerate():
     global framerate
@@ -348,18 +345,19 @@ def set_framerate():
     
 def sh_rotation():
     sh.set_rotation(int(combo_rotation.value))
-    print(combo_rotation.value)
 
 app = App(title="8x8 Grid Editor",layout="grid",height=540, width=500)
 box_top = Box(app, layout="grid", grid=[0,0,5,1])
-button_go_start = PushButton(box_top, command=go_start,grid=[0,0,2,1], text = "<<", image="/home/pi/RPi_8x8GridDraw/images/endl.png")
-button_left = PushButton(box_top, command=left,grid=[2,0,2,1], text = "<",image="/home/pi/RPi_8x8GridDraw/images/left.png")
-button_play = PushButton(box_top, command=play,grid=[4,0,2,1], text = "PLAY", image="/home/pi/RPi_8x8GridDraw/images/play.png")
-button_stop = PushButton(box_top, command=stop,grid=[6,0,2,1], text = "STOP",enabled=False, image="/home/pi/RPi_8x8GridDraw/images/stop.png")
-button_right = PushButton(box_top, command=right,grid=[8,0,2,1], text = ">",image="/home/pi/RPi_8x8GridDraw/images/right.png")
-button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>",image="/home/pi/RPi_8x8GridDraw/images/endr.png")
+button_go_start = PushButton(box_top, command=go_start,grid=[0,0,2,1], text = "<<", image=HOME+"/RPi_8x8GridDraw/images/endl.png")
+button_left = PushButton(box_top, command=left,grid=[2,0,2,1], text = "<",image=HOME+"/RPi_8x8GridDraw/images/left.png")
+button_play = PushButton(box_top, command=play,grid=[4,0,2,1], text = "PLAY", image=HOME+"/RPi_8x8GridDraw/images/play.png")
+button_stop = PushButton(box_top, command=stop,grid=[6,0,2,1], text = "STOP",enabled=False, image=HOME+"/RPi_8x8GridDraw/images/stop.png")
+button_right = PushButton(box_top, command=right,grid=[8,0,2,1], text = ">",image=HOME+"/RPi_8x8GridDraw/images/right.png")
+button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>",image=HOME+"/RPi_8x8GridDraw/images/endr.png")
 checkbox_repeat = CheckBox(app, text=" Repeat",grid=[6,0,1,1])
-slider_framerate = Slider(app, command=set_framerate, grid=[7,0,2,1],start=1, end=25)
+box_framerate = Box(app, layout="grid", grid=[7,0,2,1])
+slider_framerate = Slider(box_framerate, command=set_framerate, grid=[0,0],start=1, end=25)
+text_slider = Text(box_framerate, text="Framerate (fps)", grid = [0,1], size=10)
 
 
 matrix = Waffle(app,height=8,width=8,dim=30,command=p_clicked,color="black",grid=[0,1,7,7])
@@ -389,8 +387,6 @@ button_new_frame = PushButton(app, command=new_frame,grid=[3,11,2,1], text = "Ne
 button_new_frame = PushButton(app, command=copy_frame,grid=[5,11,2,1], text = "Duplicate")
 button_new_frame = PushButton(app, command=delete_frame,grid=[7,11,2,1], text = "Delete", padx=20)
 
-#button_export_python = PushButton(app, command=export_python,grid=[0,12,3,1], text = "Export Python")
-#button_import_python = PushButton(app, command=import_python,grid=[3,12,4,1], text = "Import Python")
 
 prev_matrix = Waffle(app,height=8,width=8,dim=8,color="grey",grid=[0,13,3,3])
 next_matrix = Waffle(app,height=8,width=8,dim=8,color="grey",grid=[7,13,3,3])
@@ -398,27 +394,37 @@ next_matrix = Waffle(app,height=8,width=8,dim=8,color="grey",grid=[7,13,3,3])
 menubar = MenuBar(app,
                   toplevel=["File"],
                   options=[
-                      [ ["Import Python file", import_python], ["Export Python file", export_python] ]
+                      [ ["Import file", import_python],
+                        ["Export as", export_as_python]
+                         ]
                   ])
 if os.path.isfile("/proc/device-tree/hat/product"):
     file = open("/proc/device-tree/hat/product","r")
     hat = file.readline()
     if  hat == "Sense HAT\x00":
-        print('Sense HAT detected')
+        #print('Sense HAT detected')
         file.close()
     else:
-        print("No SenseHAT detected")
+        #print("No SenseHAT detected")
         no_hat_check()
 else:
-    print("No SenseHAT detected")
+    #print("No SenseHAT detected")
     no_hat_check()
-    
-if not NOHAT:        
+
+
+if not NOHAT: # SenseHat detected to run normally
+    from sense_hat import SenseHat       
     sh = SenseHat()
     sh.clear(0,0,0)
 else:
-    text_rotation.disable()
-    combo_rotation.disable()
+    if ONEMU: # No SenseHat - and we're on a Pi so try the emulator
+        from sense_emu import SenseHat
+        sh = SenseHat()
+        sh.clear(0,0,0)
+        NOHAT = False
+    else: #Disable SenseHat functions
+        text_rotation.disable()
+        combo_rotation.disable()
 
 app.display()
 
