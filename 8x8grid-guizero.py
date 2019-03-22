@@ -77,6 +77,9 @@ def col_select(x,y):
     elif y == 8:
         col = (0,0,0)
         button_clear.text_color = "white"
+    elif y == 9:
+        col = (66,220,240)
+        button_clear.text_color = "black"
     box.bg =col
     button_clear.bg = col
 
@@ -356,12 +359,13 @@ button_right = PushButton(box_top, command=right,grid=[8,0,2,1], text = ">",imag
 button_go_end = PushButton(box_top, command=go_end,grid=[10,0,2,1], text = ">>",image=HOME+"/RPi_8x8GridDraw/images/endr.png")
 checkbox_repeat = CheckBox(app, text=" Repeat",grid=[6,0,1,1])
 box_framerate = Box(app, layout="grid", grid=[7,0,2,1])
+box_framerate.set_border(0,"#ff0000")
 slider_framerate = Slider(box_framerate, command=set_framerate, grid=[0,0],start=1, end=25)
 text_slider = Text(box_framerate, text="Framerate (fps)", grid = [0,1], size=10)
 
 
 matrix = Waffle(app,height=8,width=8,dim=30,command=p_clicked,color="black",grid=[0,1,7,7])
-palette = Waffle(app,height=9, width=1, dim =25, command = col_select,grid=[7,1,1,7])
+palette = Waffle(app,height=10, width=1, dim =20, command = col_select,grid=[7,1,1,7])
 palette.set_pixel(0, 0, "red")
 palette.set_pixel(0,1, (0,255,0))
 palette.set_pixel(0,2, "blue")
@@ -371,6 +375,7 @@ palette.set_pixel(0,5, "white")
 palette.set_pixel(0,6, (255,0,255))
 palette.set_pixel(0,7, "orange")
 palette.set_pixel(0,8, "black")
+palette.set_pixel(0,9, (66,220,240))
 box = Box(app, width=30,height=30,grid=[2,10,2,1])
 box.bg =col
 text_current_col = Text(app, text="Selected Colour:", grid=[0,10,3,1])
